@@ -18,6 +18,21 @@ Run::
 """
 
 import numpy as np
+import matplotlib
+import importlib
+
+def _pick_backend():
+    for name in ('TkAgg', 'Qt5Agg', 'Qt6Agg', 'WxAgg'):
+        try:
+            matplotlib.use(name)
+            importlib.import_module(f'matplotlib.backends.backend_{name.lower()}')
+            return name
+        except Exception:
+            continue
+    matplotlib.use('Agg')
+    return 'Agg'
+
+_BACKEND = _pick_backend()
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
@@ -202,7 +217,16 @@ def animate_collision(
         anim.save(save_path, writer='pillow', fps=10)
         print(f"Saved animation to {save_path}")
 
-    plt.show()
+    if _BACKEND == 'Agg':
+        out_env = "animation_collision_envelopes.png"
+        fig_env.savefig(out_env, dpi=150, bbox_inches='tight')
+        print(f"No interactive display found — envelope figure saved to {out_env}")
+        out_gif = save_path or "animation_collision.gif"
+        if not save_path:
+            anim.save(out_gif, writer='pillow', fps=10)
+            print(f"No interactive display found — animation saved to {out_gif}")
+    else:
+        plt.show()
 
 
 # -----------------------------------------------------------------------
@@ -277,9 +301,14 @@ def animate_single_bunch(
         im_yz.set_data(frames_yz[idx])
         return im_xz, im_yz
 
-    FuncAnimation(fig, update, frames=int(n_steps * 1.3),
-                  interval=60, blit=True)
-    plt.show()
+    anim = FuncAnimation(fig, update, frames=int(n_steps * 1.3),
+                         interval=60, blit=True)
+    if _BACKEND == 'Agg':
+        out_gif = "animation_single_bunch.gif"
+        anim.save(out_gif, writer='pillow', fps=10)
+        print(f"No interactive display found — animation saved to {out_gif}")
+    else:
+        plt.show()
 
 
 # -----------------------------------------------------------------------

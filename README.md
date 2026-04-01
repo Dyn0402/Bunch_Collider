@@ -22,10 +22,8 @@ Designed for accelerator physics applications such as luminosity calculations, z
 
 ### Python dependencies (installed automatically by pip)
 - Python ≥ 3.8
-- numpy, scipy
+- numpy, scipy, matplotlib
 - pybind11 ≥ 2.10 *(build-time only)*
-
-Optional (for examples): matplotlib
 
 ### C++ compiler (must be installed separately)
 
@@ -48,34 +46,64 @@ working C++ compiler first:
 
 ## Installation
 
-### Standard install (recommended for most users)
+### 1. Install system dependencies (Linux/Debian/Ubuntu)
 
 ```bash
-git clone https://github.com/your-username/bunch-collider.git
-cd bunch-collider
-pip install .
+sudo apt install build-essential python3-dev python3-tk
 ```
 
-`pip install .` fetches pybind11 automatically, then compiles the C++
-extension and installs the Python package into your active environment.
-You only need to do this once.
+> `python3-tk` is needed for interactive matplotlib plot windows. If you skip
+> this, examples will save plots to PNG files instead of opening a window.
 
-### Editable install (recommended for development)
+### 2. Clone the repository
 
 ```bash
-pip install -e .
+git clone https://github.com/Dyn0402/Bunch_Collider.git
+cd Bunch_Collider
 ```
 
-Changes to Python files (`.py`) take effect immediately.  If you edit
-`bunch_collider/_bunch_density_cpp.cpp` you need to rerun
-`pip install -e .` (or `python setup.py build_ext --inplace`) to recompile.
+### 3. Create and activate a virtual environment
 
-### Verify the installation
-
-```python
-from bunch_collider import BunchCollider, BunchDensity
-print("Installation successful!")
+```bash
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
 ```
+
+### 4. Install the package
+
+```bash
+pip install ".[examples]"
+```
+
+This fetches all Python dependencies (numpy, scipy, matplotlib), downloads
+pybind11, and compiles the C++ extension.  You only need to do this once.
+
+### 5. Verify the installation
+
+```bash
+python -c "from bunch_collider import BunchCollider, BunchDensity; print('Installation successful!')"
+```
+
+### 6. Run an example
+
+```bash
+python examples/basic_collision.py
+```
+
+A figure window should open showing the z-vertex distribution. If no display
+is available the plot is saved to `basic_collision.png` instead.
+
+---
+
+### Editable install (for development)
+
+```bash
+pip install -e ".[examples]"
+```
+
+Changes to `.py` files take effect immediately. If you edit
+`bunch_collider/_bunch_density_cpp.cpp` rerun `pip install -e ".[examples]"`
+(or `python setup.py build_ext --inplace`) to recompile.
 
 ---
 

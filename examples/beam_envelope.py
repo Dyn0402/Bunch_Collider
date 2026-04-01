@@ -18,6 +18,21 @@ Run::
 """
 
 import numpy as np
+import matplotlib
+import importlib
+
+def _pick_backend():
+    for name in ('TkAgg', 'Qt5Agg', 'Qt6Agg', 'WxAgg'):
+        try:
+            matplotlib.use(name)
+            importlib.import_module(f'matplotlib.backends.backend_{name.lower()}')
+            return name
+        except Exception:
+            continue
+    matplotlib.use('Agg')
+    return 'Agg'
+
+_BACKEND = _pick_backend()
 import matplotlib.pyplot as plt
 
 from bunch_collider import BunchCollider
@@ -116,7 +131,12 @@ def main(
     fig.suptitle('Beam Envelopes and Z-Vertex Distributions', y=1.01)
     fig.tight_layout()
     fig.subplots_adjust(wspace=0.06, hspace=0.1)
-    plt.show()
+    if _BACKEND == 'Agg':
+        out = "beam_envelope.png"
+        fig.savefig(out, dpi=150, bbox_inches='tight')
+        print(f"No interactive display found — figure saved to {out}")
+    else:
+        plt.show()
 
 
 if __name__ == '__main__':
