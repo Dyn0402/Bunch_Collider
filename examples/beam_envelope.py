@@ -41,6 +41,7 @@ from bunch_collider import BunchCollider
 def _draw_envelope(ax, z_cm, sigma_um, beta_star_cm,
                    x_offset_um=0., angle_rad=0., color='steelblue', label=None):
     """Draw the ±1σ hourglass beam envelope on *ax* (y in mm, z in cm)."""
+    angle_rad *= -1  # Convention of the simulation is a negative angle relative to this visualization.
     env = sigma_um * np.sqrt(1. + (z_cm / beta_star_cm) ** 2)
     z_um = z_cm * 1e4
     y_top =  env * np.cos(angle_rad) - z_um * np.sin(angle_rad) + x_offset_um
@@ -72,9 +73,9 @@ def main(
         dict(x_off= x_offset, angle=0.,
              title='Offset only',
              label=rf'$\theta=0$, offset $={x_offset:.0f}$ μm'),
-        dict(x_off=-x_offset, angle=-angle_x,
+        dict(x_off=x_offset, angle=-angle_x,
              title='Offset + opposite angle',
-             label=rf'$\theta={-angle_x*1e3:.1f}$ mrad, offset $={-x_offset:.0f}$ μm'),
+             label=rf'$\theta={-angle_x*1e3:.1f}$ mrad, offset $={x_offset:.0f}$ μm'),
     ]
 
     fig, axs = plt.subplots(2, 3, figsize=(11, 5), sharex='all', sharey='row')
@@ -128,7 +129,7 @@ def main(
         axs[0, col].tick_params(labelleft=False)
         axs[1, col].tick_params(labelleft=False)
 
-    fig.suptitle('Beam Envelopes and Z-Vertex Distributions', y=1.01)
+    fig.suptitle('Beam Envelopes and Z-Vertex Distributions')
     fig.tight_layout()
     fig.subplots_adjust(wspace=0.06, hspace=0.1)
     if _BACKEND == 'Agg':
